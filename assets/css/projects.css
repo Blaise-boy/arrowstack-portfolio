@@ -1,0 +1,125 @@
+/* ==========================================================================
+   projects.css  -  styles used only on the Projects page
+   Contents
+   1. Page head
+   2. Stacked project cards
+   3. Browser-frame screenshot
+   4. Card text
+   5. How I build (light section)
+   ========================================================================== */
+
+
+/* 1. PAGE HEAD --------------------------------------------------------------- */
+.page-head { padding-block: clamp(2.5rem, 6vw, 5rem) clamp(2rem, 4vw, 3rem); }
+.page-head h1 {
+  margin-bottom: 1.25rem;
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 1.1; letter-spacing: -0.03em;
+}
+.page-lead { max-width: 52ch; margin: 0; font-size: 1.15rem; color: var(--text-muted); }
+
+
+/* 2. STACKED PROJECT CARDS ----------------------------------------------------
+   Each card sticks near the top of the screen while you scroll. The next card
+   slides up and over it, and the one underneath shrinks and darkens a little,
+   so the cards pile up like a deck. projects.js sets the shrink (transform)
+   and the darkness (--shade) while you scroll.
+   Phones, short windows and weak devices get a plain list instead. */
+.stack { padding-bottom: clamp(3rem, 8vw, 6rem); }
+
+.stack-card {
+  --shade: 0;                              /* 0 = normal, 0.5 = dimmed (set by projects.js) */
+  position: relative;
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 3vw, 3rem); align-items: center;
+  margin-bottom: clamp(1.5rem, 12vh, 6rem);
+  padding: clamp(1.25rem, 2.4vw, 2rem);
+  border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+  /* Solid background, so the card underneath never shows through */
+  background:
+    radial-gradient(30rem 16rem at 100% 0%, rgba(255, 158, 13, 0.1), transparent 62%),
+    var(--ink-raised);
+  box-shadow: 0 -18px 50px -28px rgba(0, 0, 0, 0.7), 0 30px 80px -40px rgba(0, 0, 0, 0.85);
+  transform-origin: 50% 0;                 /* shrink toward the top edge, so the stacked strips stay visible */
+}
+.stack-card:last-child { margin-bottom: 0; }
+.stack-card::after {                       /* the dimming layer */
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: var(--ink-deep); opacity: var(--shade); pointer-events: none;
+}
+
+@media (min-width: 900px) and (min-height: 640px) {
+  html:not([data-perf="low"]) .stack-card {
+    position: sticky;
+    top: calc(var(--nav-h) + 1.25rem + var(--i) * 18px);   /* each card sits 18px lower than the one before */
+    will-change: transform;
+  }
+  /* A card can only stay pinned while its parent still has room below it.
+     This empty spacer provides that room for the last card. */
+  html:not([data-perf="low"]) .stack-end { height: 42vh; }
+}
+
+@media (max-width: 899px) {
+  .stack-card { grid-template-columns: 1fr; margin-bottom: 1.75rem; }
+}
+
+
+/* 3. BROWSER-FRAME SCREENSHOT ------------------------------------------------- */
+.frame {
+  display: block; overflow: hidden;
+  border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  background: #0a0f2e; text-decoration: none;
+}
+.frame-bar {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(239, 231, 218, 0.06);
+}
+.dots { display: flex; gap: 6px; }
+.dots i { width: 9px; height: 9px; border-radius: 50%; background: rgba(239, 231, 218, 0.28); }
+.frame-url {
+  flex: 1; min-width: 0; padding: 0.2rem 0.8rem;
+  border-radius: 999px; background: rgba(7, 12, 41, 0.75);
+  font-size: 0.78rem; text-align: center; color: var(--text-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.frame-img {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: 2 / 1; object-fit: cover; object-position: top;
+}
+
+
+/* 4. CARD TEXT --------------------------------------------------------------- */
+.stack-index { margin: 0 0 0.6rem; font: 700 0.9rem/1 var(--font-display); letter-spacing: 0.04em; color: var(--amber); }
+.stack-index span { color: var(--text-dim); }
+.stack-type { margin: 0 0 0.4rem; font-size: 0.95rem; font-weight: 600; color: var(--text-muted); }
+.stack-body h2 { margin-bottom: 1rem; font-size: clamp(1.7rem, 3vw, 2.4rem); }
+
+.stack-features { display: grid; gap: 0.55rem; margin: 0 0 1.25rem; padding: 0; list-style: none; }
+.stack-features li { position: relative; padding-left: 1.1rem; font-size: 0.96rem; color: var(--text-muted); }
+.stack-features li::before {
+  content: ""; position: absolute; left: 0; top: 0.72em;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--amber);
+}
+.stack-actions { margin-top: 1.5rem; }
+
+
+/* 5. HOW I BUILD (inside a .section-light band) ---------------------------------- */
+.steps {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  margin: 0; padding: 0; list-style: none;
+}
+.steps li { padding-top: 1.4rem; border-top: 1px solid var(--line-strong); }
+.step-num {
+  display: inline-grid; place-items: center; min-width: 2rem; height: 2rem; padding-inline: 0.6rem;
+  border-radius: 999px; background: var(--amber); color: var(--ink);
+  font: 800 0.9rem/1 var(--font-display);
+}
+.steps h3 { margin: 0.9rem 0 0.4rem; font-size: 1.25rem; }
+.steps p { margin: 0; color: var(--text-muted); }
+
+@media (max-width: 799px) {
+  .steps { grid-template-columns: 1fr; }
+}

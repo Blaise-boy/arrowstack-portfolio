@@ -1,0 +1,518 @@
+/* ==========================================================================
+   style.css  -  Chiagoziem Blaise Charles portfolio
+   Shared design system. Page-specific styles get added in later steps.
+
+   Contents
+   1.  Design tokens (colours, fonts, spacing)
+   2.  Reset and base
+   3.  Ambient background
+   4.  Layout helpers
+   5.  Buttons
+   6.  Glass surface
+   7.  Header and navigation
+   8.  Footer and back-to-top
+   9.  Page fade and scroll reveal
+   10. Performance tiers and reduced motion
+   11. 3D tilt cards
+   12. Light (Bone) sections
+   13. Shared page components
+   ========================================================================== */
+
+
+/* 1. DESIGN TOKENS --------------------------------------------------------- */
+:root {
+  /* Palette: three colours.
+     Indigo Black #070C29 for backgrounds, Bone #EFE7DA for text and light sections,
+     Amber #FF9E0D for the one thing you want noticed (buttons, active link, glow). */
+  --ink-deep: #04071c;             /* darkest layer, behind everything */
+  --ink: #070c29;                  /* Indigo Black: the main background */
+  --ink-raised: #0f1640;           /* panels and cards that sit on the background */
+  --panel-solid: #0b1233;          /* used when glass is switched off */
+  --bone: #efe7da;                 /* Bone */
+  --amber: #ff9e0d;                /* Amber */
+  --amber-glow: rgba(255, 158, 13, 0.38);
+
+  /* Text (Bone at lower strengths, all pass contrast on Indigo Black) */
+  --text: #efe7da;
+  --text-muted: #aeaaa8;
+  --text-dim: #8b8990;
+
+  /* Lines and glass */
+  --line: rgba(239, 231, 218, 0.14);
+  --line-strong: rgba(239, 231, 218, 0.3);
+  --glass: rgba(15, 22, 64, 0.6);
+  --blur: 16px;                    /* lowered on weaker devices, see section 10 */
+  --focus: #ffb94d;
+
+  /* Type */
+  --font-display: "Syne", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-body: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  /* Shape: radius follows importance, big surfaces are rounder than small ones */
+  --r-sm: 12px;
+  --r-md: 20px;
+  --r-lg: 32px;
+
+  /* Layout */
+  --container: 1180px;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --nav-h: 76px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+
+/* 2. RESET AND BASE -------------------------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--ink-deep);
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--nav-h);       /* room for the fixed header */
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+main { flex: 1 0 auto; }
+
+img, svg { display: block; max-width: 100%; }
+img { height: auto; }
+
+h1, h2, h3, h4 {
+  margin: 0 0 0.6em;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+h1 { font-size: clamp(2.6rem, 7.2vw, 5.4rem); letter-spacing: -0.035em; }
+h2 { font-size: clamp(1.6rem, 3.3vw, 2.5rem); }
+h3 { font-size: clamp(1.25rem, 2.2vw, 1.55rem); font-weight: 700; line-height: 1.2; }
+
+p { margin: 0 0 1em; }
+.prose { max-width: 62ch; color: var(--text-muted); }
+
+a { color: var(--amber); text-underline-offset: 3px; }
+a:hover { color: #ffb54a; }
+
+::selection { background: var(--amber); color: var(--ink); }
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: fixed; top: 0.75rem; left: 0.75rem; z-index: 200;
+  padding: 0.6rem 1rem; border-radius: var(--r-sm);
+  background: var(--bone); color: var(--ink); font-weight: 700; text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+
+
+/* 3. AMBIENT BACKGROUND ----------------------------------------------------
+   One fixed layer behind everything: soft colour glows, no lines or patterns.
+   It never moves, so it costs almost nothing to draw. */
+body::before {
+  content: "";
+  position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(60rem 38rem at 88% -8%, rgba(255, 158, 13, 0.09), transparent 62%),
+    radial-gradient(52rem 36rem at -8% 22%, rgba(58, 78, 205, 0.2), transparent 62%),
+    linear-gradient(180deg, var(--ink), var(--ink-deep) 70%);
+}
+
+/* 4. LAYOUT HELPERS -------------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section { padding-block: clamp(4rem, 9vw, 7.5rem); }
+.section-tight { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+
+/* Small label above a heading. Sentence case, no decoration. */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  margin: 0 0 1rem;
+  font-size: 0.95rem; font-weight: 600; color: var(--text-muted);
+}
+.eyebrow::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--amber); box-shadow: 0 0 12px rgba(255, 158, 13, 0.7);
+}
+
+
+/* 5. BUTTONS --------------------------------------------------------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.7rem;
+  padding: 0.85rem 1.5rem;
+  border: 1px solid transparent; border-radius: 999px;
+  font: 600 0.95rem/1 var(--font-body);
+  color: var(--text); text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease),
+              background-color 0.25s, border-color 0.25s;
+}
+.btn:hover { color: var(--text); transform: translateY(-2px); }
+
+.btn-primary {
+  color: var(--ink);
+  background: var(--amber);
+  box-shadow: 0 10px 30px -10px var(--amber-glow);
+}
+.btn-primary:hover { color: var(--ink); background: #ffae3d; box-shadow: 0 16px 36px -10px var(--amber-glow); }
+
+.btn-ghost {
+  background: rgba(239, 231, 218, 0.04);
+  border-color: var(--line-strong);
+}
+.btn-ghost:hover { border-color: var(--amber); background: rgba(255, 158, 13, 0.1); }
+
+/* Button with a small round amber arrow at the end: add btn-with-icon to the button */
+.btn-with-icon { padding-right: 0.55rem; }
+.btn-icon {
+  display: grid; place-items: center;
+  width: 1.7rem; height: 1.7rem;
+  border-radius: 50%; background: var(--amber); color: var(--ink);
+  transition: transform 0.25s var(--ease);
+}
+.btn:hover .btn-icon { transform: translateX(3px); }
+.btn-icon svg { width: 0.95rem; height: 0.95rem; }
+
+
+/* 6. GLASS SURFACE ----------------------------------------------------------
+   Frosted panel used for cards. Blur strength comes from --blur so weaker
+   devices can lower it (section 10). */
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  -webkit-backdrop-filter: blur(var(--blur));
+          backdrop-filter: blur(var(--blur));
+  box-shadow: 0 24px 60px -30px rgba(0, 0, 0, 0.7);
+}
+.glass-hover {
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.glass-hover:hover {
+  border-color: rgba(255, 158, 13, 0.55);
+  box-shadow: 0 0 0 1px rgba(255, 158, 13, 0.22), 0 24px 60px -24px var(--amber-glow);
+}
+
+
+/* 7. HEADER AND NAVIGATION ------------------------------------------------- */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--nav-h);
+  background: rgba(7, 12, 41, 0.35);
+  border-bottom: 1px solid transparent;
+  -webkit-backdrop-filter: blur(var(--blur));
+          backdrop-filter: blur(var(--blur));
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.site-header.is-scrolled {
+  background: rgba(7, 12, 41, 0.84);
+  border-bottom-color: var(--line);
+}
+
+.nav-wrap {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;   /* logo | menu centred | button */
+  align-items: center;
+  gap: 1.5rem;
+}
+
+/* Logo: your name on two lines */
+.brand {
+  display: inline-flex; align-items: center; gap: 0.8rem;
+  justify-self: start; text-decoration: none; color: var(--text);
+}
+.brand:hover { color: var(--text); }
+.brand-name {
+  display: flex; flex-direction: column;
+  font: 800 1.15rem/1.1 var(--font-display); letter-spacing: -0.01em;
+}
+.brand-name small {
+  margin-top: 0.2rem;
+  font: 500 0.85rem/1 var(--font-body); letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+/* Menu links */
+.main-nav ul {
+  display: flex; align-items: center; gap: clamp(1.25rem, 3vw, 2.5rem);
+  margin: 0; padding: 0; list-style: none;
+}
+.nav-link {
+  position: relative; display: inline-block; padding: 0.5rem 0.1rem;
+  font-size: 0.97rem; font-weight: 600;
+  color: var(--text-muted); text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link::after {                      /* underline that grows in */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0.1rem; height: 2px;
+  border-radius: 2px; background: var(--amber);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.3s var(--ease);
+}
+.nav-link:hover { color: var(--text); }
+.nav-link:hover::after { transform: scaleX(0.4); }
+.nav-link[aria-current="page"] { color: var(--text); }
+.nav-link[aria-current="page"]::after { transform: scaleX(1); }
+
+.nav-cta { justify-self: end; padding-block: 0.55rem; }
+.nav-cta-mobile { display: none; }
+
+/* Hamburger (phones and small tablets only) */
+.nav-toggle {
+  display: none; justify-self: end;
+  width: 46px; height: 46px; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+  background: rgba(255, 255, 255, 0.04); cursor: pointer;
+}
+.nav-toggle-bars,
+.nav-toggle-bars::before,
+.nav-toggle-bars::after {
+  display: block; width: 20px; height: 2px; margin-inline: auto;
+  border-radius: 2px; background: var(--text);
+  transition: transform 0.3s var(--ease), opacity 0.2s;
+}
+.nav-toggle-bars { position: relative; }
+.nav-toggle-bars::before,
+.nav-toggle-bars::after { content: ""; position: absolute; left: 0; }
+.nav-toggle-bars::before { top: -6px; }
+.nav-toggle-bars::after { top: 6px; }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars { background: transparent; }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars::before { top: 0; transform: rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars::after { top: 0; transform: rotate(-45deg); }
+
+@media (max-width: 899px) {
+  .nav-wrap { grid-template-columns: 1fr auto; }
+  .nav-cta { display: none; }
+  .nav-toggle { display: block; }
+
+  .main-nav {
+    position: absolute; top: 100%; left: 0; right: 0;   /* hangs below the header */
+    max-height: calc(100vh - var(--nav-h)); overflow-y: auto;
+    padding: 1.25rem var(--gutter) 1.75rem;
+    background: var(--ink);                              /* solid, so page text never shows through */
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.8);
+    opacity: 0; visibility: hidden; transform: translateY(-10px);
+    transition: opacity 0.25s, transform 0.3s var(--ease), visibility 0.3s;
+  }
+  .main-nav.is-open { opacity: 1; visibility: visible; transform: none; }
+  .main-nav ul { flex-direction: column; align-items: stretch; gap: 0; }
+  .nav-link {
+    display: block; padding: 0.95rem 0; font-size: 1.1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-link::after { display: none; }
+  .nav-link[aria-current="page"] { color: var(--amber); }
+  .nav-cta-mobile { display: inline-flex; margin-top: 1.25rem; }
+}
+
+/* Without JavaScript the hamburger cannot work, so show the menu in the page */
+html:not(.js) .nav-toggle { display: none; }
+@media (max-width: 899px) {
+  html:not(.js) .main-nav {
+    position: static; opacity: 1; visibility: visible; transform: none;
+    background: none; border: 0; padding: 0;
+  }
+  html:not(.js) .site-header { position: static; height: auto; padding-block: 0.75rem; }
+  html:not(.js) body { padding-top: 0; }
+  html:not(.js) .main-nav ul { flex-direction: row; flex-wrap: wrap; gap: 1rem; }
+  html:not(.js) .nav-link { border: 0; font-size: 1rem; padding: 0.4rem 0; }
+}
+
+
+/* 8. FOOTER AND BACK-TO-TOP ------------------------------------------------ */
+.site-footer {
+  margin-top: clamp(3rem, 8vw, 6rem);
+  padding-top: clamp(2.5rem, 6vw, 4rem);
+  border-top: 1px solid var(--line);
+  background: linear-gradient(180deg, transparent, rgba(4, 7, 28, 0.75));
+}
+.footer-grid {
+  display: grid; grid-template-columns: 1.5fr 0.8fr 1.1fr 1.4fr; gap: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+.footer-about { max-width: 34ch; margin: 1.1rem 0 0; font-size: 0.97rem; color: var(--text-muted); }
+.footer-title { margin: 0 0 1rem; font: 700 1rem/1.2 var(--font-display); letter-spacing: 0; }
+.footer-links { display: grid; gap: 0.7rem; margin: 0; padding: 0; list-style: none; }
+.footer-links a {
+  display: inline-flex; align-items: center; gap: 0.65rem;
+  color: var(--text-muted); text-decoration: none; font-size: 0.97rem;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--text); }
+.footer-links svg { width: 18px; height: 18px; flex: none; }
+
+.footer-bottom {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem 2rem;
+  padding-block: 1.4rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem; color: var(--text-dim);
+}
+.footer-bottom p { margin: 0; }
+
+/* Tablets and phones: name on top, Pages and Projects side by side, contact links underneath */
+@media (max-width: 899px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .footer-grid > :first-child,
+  .footer-grid > :last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 479px) {
+  .footer-grid { gap: 2rem 1.25rem; padding-bottom: 2rem; }
+  .footer-links { gap: 0.55rem; }
+  .footer-links a { font-size: 0.92rem; }
+  .footer-title { margin-bottom: 0.8rem; }
+}
+
+.to-top {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 90;
+  display: grid; place-items: center;
+  width: 48px; height: 48px; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: 50%;
+  background: rgba(7, 12, 41, 0.92); color: var(--text); cursor: pointer;
+  opacity: 0; visibility: hidden; transform: translateY(10px);
+  transition: opacity 0.25s, transform 0.3s var(--ease), visibility 0.3s,
+              border-color 0.2s, background-color 0.2s;
+}
+.to-top.is-visible { opacity: 1; visibility: visible; transform: none; }
+.to-top:hover { border-color: var(--amber); background: rgba(255, 158, 13, 0.16); }
+.to-top svg { width: 20px; height: 20px; }
+
+
+/* 9. PAGE FADE AND SCROLL REVEAL ------------------------------------------- */
+body { animation: page-in 0.55s var(--ease) both; }
+body.is-leaving { opacity: 0; transition: opacity 0.2s ease; }
+
+@keyframes page-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Elements marked data-reveal start hidden and settle in when scrolled into view.
+   The "js" class is added by a tiny script in <head>, so with JavaScript off
+   nothing stays hidden. */
+.js [data-reveal] {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  transition-delay: var(--delay, 0ms);
+}
+.js [data-reveal].is-visible { opacity: 1; transform: none; }
+
+
+/* 10. PERFORMANCE TIERS AND REDUCED MOTION ----------------------------------
+   A small script sets data-perf="high" | "mid" | "low" on <html>
+   (see header.php). Weaker devices get cheaper visuals automatically. */
+[data-perf="mid"] { --blur: 8px; }
+
+[data-perf="low"] .glass,
+[data-perf="low"] .site-header {
+  -webkit-backdrop-filter: none;
+          backdrop-filter: none;
+}
+[data-perf="low"] .glass { background: var(--panel-solid); }
+[data-perf="low"] .site-header { background: rgba(7, 12, 41, 0.96); }
+[data-perf="low"] .js [data-reveal] { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .js [data-reveal] { opacity: 1; transform: none; }
+}
+
+
+/* 11. 3D TILT CARDS ---------------------------------------------------------
+   Any element with data-tilt gets rotated toward the mouse by tilt.js.
+   This only sets how it eases: quick while following, slow when it settles. */
+[data-tilt] {
+  transform-style: preserve-3d;
+  transition: transform 0.45s var(--ease), border-color 0.3s, box-shadow 0.3s;
+  will-change: transform;
+}
+[data-tilt].is-tilting { transition: transform 0.08s linear, border-color 0.3s, box-shadow 0.3s; }
+
+
+/* 12. LIGHT (BONE) SECTIONS --------------------------------------------------
+   Add class "section-light" next to "section" to flip a band to Bone.
+   Everything inside reads the colour tokens, so overriding them here
+   re-colours the text, borders and buttons automatically. */
+.section-light {
+  --text: var(--ink);
+  --text-muted: #484a5a;
+  --line: rgba(7, 12, 41, 0.16);
+  --line-strong: rgba(7, 12, 41, 0.34);
+  --focus: var(--ink);
+  background: var(--bone);
+  color: var(--ink);
+}
+.section-light ::selection { background: var(--ink); color: var(--bone); }
+
+
+/* 13. SHARED PAGE COMPONENTS -------------------------------------------------
+   Used on more than one page: section heads, small tags, contact call-to-action. */
+/* Section heading with an optional button on the right */
+.section-head {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between;
+  gap: 1.25rem 2rem; margin-bottom: clamp(1.75rem, 4vw, 2.75rem);
+}
+.section-head h2 { margin: 0 0 0.4rem; }
+.section-head p { margin: 0; }
+
+/* Small rounded labels (technologies, skills) */
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.tags li {
+  padding: 0.25rem 0.75rem; border: 1px solid var(--line); border-radius: 999px;
+  font-size: 0.82rem; font-weight: 600; color: var(--text-muted);
+}
+
+/* Contact call-to-action (Home and About) */
+.cta {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 1.75rem 2.5rem;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(38rem 20rem at 100% 0%, rgba(255, 158, 13, 0.16), transparent 62%),
+    var(--glass);
+}
+.cta h2 { margin: 0 0 0.6rem; max-width: 24ch; font-size: clamp(1.45rem, 2.8vw, 2.1rem); }
+.cta p { margin: 0; }
+.cta-actions { display: flex; flex-wrap: wrap; gap: 1rem; }
+[data-perf="low"] .cta { background: var(--panel-solid); }
+
+.cta-actions .btn svg { width: 18px; height: 18px; flex: none; }

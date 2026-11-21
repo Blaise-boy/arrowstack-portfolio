@@ -1,0 +1,171 @@
+/* ==========================================================================
+   about.css  -  styles used only on the About page
+   Contents
+   1. Intro (story, at a glance, portrait)
+   2. Skills (light section)
+   3. Experience timeline
+   4. Education and certificates (light section)
+   ========================================================================== */
+
+
+/* 1. INTRO ------------------------------------------------------------------ */
+.about-hero { padding-block: clamp(2.5rem, 6vw, 5rem) clamp(4rem, 9vw, 7rem); }   /* space above, and room before the Bone band below */
+
+.about-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.about-hero h1 {
+  margin-bottom: 1.5rem;
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.about-lead { max-width: 46ch; font-size: 1.2rem; color: var(--text); }
+.about-copy p { max-width: 58ch; color: var(--text-muted); }
+.about-copy .about-lead { color: var(--text); }
+.about-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1.75rem; }
+.about-actions .btn svg { width: 18px; height: 18px; flex: none; }
+
+/* At a glance: four quick facts */
+.glance {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 2.25rem 0 0; padding: 0;
+  border-top: 1px solid var(--line);
+}
+.glance div { padding: 1rem 1.25rem 1rem 0; border-bottom: 1px solid var(--line); }
+.glance dt { margin-bottom: 0.2rem; font-size: 0.82rem; font-weight: 600; color: var(--text-dim); }
+.glance dd { margin: 0; font-weight: 600; line-height: 1.4; }
+
+/* Portrait: tilts in 3D on hover (tilt.js), warm glow behind it */
+.portrait-wrap { position: relative; justify-self: center; width: min(100%, 400px); perspective: 1000px; }
+.portrait-wrap::before {
+  content: ""; position: absolute; inset: 6% -10% -8% 12%; z-index: -1;
+  background: radial-gradient(closest-side, rgba(255, 158, 13, 0.26), transparent 72%);
+}
+.portrait {
+  position: relative; margin: 0; overflow: hidden;
+  border: 1px solid var(--line-strong); border-radius: var(--r-lg);
+  background: var(--ink-raised);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.8);
+}
+.portrait img { display: block; width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; }
+.portrait figcaption {
+  position: absolute; left: 1rem; bottom: 1rem;
+  padding: 0.4rem 0.9rem; border: 1px solid var(--line-strong); border-radius: 999px;
+  background: rgba(7, 12, 41, 0.78);
+  font-size: 0.85rem; font-weight: 600;
+}
+
+@media (max-width: 899px) {
+  .about-hero-grid { grid-template-columns: 1fr; }
+  .portrait-wrap { width: min(100%, 340px); justify-self: start; }
+}
+@media (max-width: 479px) {
+  .glance { grid-template-columns: 1fr; }
+}
+
+
+/* 2. SKILLS (inside a .section-light band) ---------------------------------- */
+.skills-grid {
+  display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+.skill-group {
+  grid-column: span 2;
+  padding: 1.6rem;
+  border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.4);
+}
+.skill-group:nth-child(-n + 2) { grid-column: span 3; }    /* first row: two wide cards */
+.skill-group h3 { margin-bottom: 0.35rem; font-size: 1.15rem; }
+.skill-group > p { margin: 0 0 1.1rem; font-size: 0.95rem; color: var(--text-muted); }
+.skill-group .tags li { border-color: var(--line-strong); background: rgba(7, 12, 41, 0.04); color: var(--text); }
+
+@media (max-width: 899px) {
+  .skills-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .skill-group,
+  .skill-group:nth-child(-n + 2) { grid-column: auto; }
+}
+@media (max-width: 599px) {
+  .skills-grid { grid-template-columns: 1fr; }
+}
+
+
+/* 3. EXPERIENCE TIMELINE ------------------------------------------------------ */
+.split {
+  display: grid; grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.5fr);
+  gap: clamp(2rem, 6vw, 5rem); align-items: start;
+}
+.split-intro { position: sticky; top: calc(var(--nav-h) + 2rem); }
+.split-intro h2 { margin-bottom: 1rem; }
+.split-intro p { max-width: 34ch; margin: 0; }
+
+.timeline { position: relative; margin: 0; padding: 0 0 0 2rem; list-style: none; }
+.timeline::before {                      /* the vertical line */
+  content: ""; position: absolute; left: 6px; top: 0.5rem; bottom: 0.5rem; width: 1px;
+  background: linear-gradient(var(--amber), var(--line-strong) 22%, var(--line));
+}
+.timeline-item { position: relative; padding-bottom: clamp(2rem, 4vw, 3rem); }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-item::before {                 /* the dot on the line */
+  content: ""; position: absolute; left: calc(-2rem + 1px); top: 0.5rem;
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--ink); border: 2px solid var(--amber);
+}
+.timeline-item.is-current::before { background: var(--amber); box-shadow: 0 0 0 5px rgba(255, 158, 13, 0.18); }
+
+.timeline-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.2rem 1.5rem; margin-bottom: 0.3rem; }
+.timeline-head h3 { margin: 0; }
+.timeline-date { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
+.is-current .timeline-date { color: var(--amber); }
+.timeline-org { margin: 0 0 0.9rem; font-size: 0.97rem; font-weight: 600; color: var(--text-muted); }
+
+.timeline-points { display: grid; gap: 0.55rem; max-width: 66ch; margin: 0; padding: 0; list-style: none; }
+.timeline-points li { position: relative; padding-left: 1.1rem; font-size: 0.98rem; color: var(--text-muted); }
+.timeline-points li::before {
+  content: ""; position: absolute; left: 0; top: 0.72em;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--amber);
+}
+
+@media (max-width: 899px) {
+  .split { grid-template-columns: 1fr; }
+  .split-intro { position: static; }
+}
+
+
+/* 4. EDUCATION AND CERTIFICATES (inside a .section-light band) -------------------- */
+.credentials-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(2rem, 5vw, 4rem);
+}
+.list-title { margin-bottom: 1rem; font-size: 1.3rem; }
+
+.credential-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line-strong); }
+.credential-list li {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start;
+  gap: 0.25rem 1.5rem; padding: 1.15rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.credential-list h4 {
+  margin: 0 0 0.25rem; font-family: var(--font-body);   /* body font: the wide heading font is too heavy for long titles */
+  font-size: 1.05rem; font-weight: 700; line-height: 1.35; letter-spacing: 0;
+}
+.credential-list p { margin: 0; font-size: 0.95rem; color: var(--text-muted); }
+.credential-when { font-size: 0.9rem; font-weight: 700; white-space: nowrap; }
+
+/* "In progress" label, with an amber dot */
+.status {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.12rem 0.7rem; border: 1px solid var(--ink); border-radius: 999px;
+  font-size: 0.82rem; font-weight: 700; white-space: nowrap;
+}
+.status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); }
+
+@media (max-width: 799px) {
+  .credentials-grid { grid-template-columns: 1fr; }
+}

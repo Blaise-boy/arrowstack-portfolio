@@ -1,0 +1,198 @@
+/* ==========================================================================
+   home.css  -  styles used only on the Home page
+   Contents
+   1. Hero (headline, avatar stage, 3D companion)
+   2. About preview
+   3. Featured projects
+   (section heads, tags and the contact call-to-action moved to style.css, section 13)
+   ========================================================================== */
+
+
+/* 1. HERO ------------------------------------------------------------------ */
+.hero {
+  position: relative;
+  min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100svh - var(--nav-h));
+  display: flex; align-items: center;
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+  overflow-x: clip;
+}
+.hero-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(1rem, 3vw, 3rem);
+  align-items: center;
+}
+.hero-copy { padding-bottom: clamp(2rem, 6vw, 4rem); }
+
+/* Syne is a very wide face, so the headline is sized to fit its column */
+.hero h1 {
+  margin-bottom: 1.4rem;
+  font-size: clamp(1.85rem, 2.2vw + 1rem, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+.hero h1 .line { display: block; }
+
+.hero-intro { max-width: 50ch; font-size: 1.08rem; color: var(--text-muted); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2rem; }
+
+/* The one orchestrated moment on the page: hero text rises in, line by line */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+.rise { animation: rise 0.9s var(--ease) both; animation-delay: var(--d, 0ms); }
+
+/* ---- Avatar stage ----
+   Layers, back to front: glow, giant name, avatar.
+   Sized from the window height so the whole avatar fits on one screen. */
+.stage {
+  --px: 0; --py: 0;                       /* pointer position, set by home.js */
+  position: relative;
+  width: min(100%, calc((100svh - var(--nav-h) - 2rem) * 0.85));
+  margin-inline: auto; align-self: end;
+  aspect-ratio: 100 / 118;
+  container-type: inline-size;            /* lets children size text in "cqw" = % of stage width */
+  perspective: 1000px;
+  animation: rise 1.1s var(--ease) both 0.25s;
+}
+
+.stage-orb {
+  position: absolute; left: 50%; top: 52%;
+  width: 98%; aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 158, 13, 0.34) 0%, rgba(255, 158, 13, 0.12) 40%, transparent 68%);
+  box-shadow: inset 0 0 0 1px rgba(239, 231, 218, 0.1);
+}
+
+.stage-name {
+  position: absolute; left: 0; right: 0; top: -2%;
+  text-align: center;
+  font: 800 19cqw/1 var(--font-display);
+  letter-spacing: -0.045em;
+  color: transparent;
+  background: linear-gradient(180deg, rgba(239, 231, 218, 0.96), rgba(239, 231, 218, 0.52));
+  -webkit-background-clip: text; background-clip: text;
+  pointer-events: none; user-select: none;
+  translate: calc(var(--px) * -22px) calc(var(--py) * -10px);   /* moves against the avatar = depth */
+}
+
+.avatar-stack {
+  position: absolute; left: 7%; right: 7%; bottom: 0;
+  aspect-ratio: 640 / 857;
+  transform-origin: 50% 85%;
+  /* --px and --py (-1 to +1) are eased toward the pointer by home.js every frame.
+     No CSS transition here on purpose: home.js already does the smoothing. */
+  transform: rotateX(calc(var(--py) * -4deg)) rotateY(calc(var(--px) * 7deg));
+  translate: calc(var(--px) * 14px) calc(var(--py) * 8px);
+  /* shoulders fade out softly at the bottom of the hero */
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+}
+.avatar-img {
+  display: block; width: 100%; height: 100%; object-fit: contain;
+  user-select: none; -webkit-user-drag: none;
+}
+
+/* Weak devices and reduced motion: a still picture */
+[data-perf="low"] .avatar-stack,
+[data-perf="low"] .stage-name { transform: none; translate: none; }
+
+/* ---- 3D companion (drawn by companion.js) ----
+   A transparent canvas laid over the whole hero. It ignores clicks, so buttons
+   underneath still work. It fades in only after the first frame is drawn. */
+.companion {
+  position: absolute; inset: 0; z-index: 6;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.8s ease;
+}
+.companion.is-on { opacity: 1; }
+
+/* On phones, vertical swipes still scroll the page, while sideways swipes
+   move the companion instead of being ignored. */
+.hero { touch-action: pan-y; }
+
+@media (max-width: 899px) {
+  .hero { min-height: 0; padding-top: 1.5rem; }
+  .hero-grid { grid-template-columns: 1fr; gap: 0.5rem; }
+  .hero-copy { padding-bottom: 0; }
+  .hero h1 { font-size: clamp(1.45rem, 6.3vw, 2.6rem); }
+  .stage { width: min(100%, 400px); }
+}
+
+
+/* 2. ABOUT PREVIEW ---------------------------------------------------------- */
+.about-head {
+  display: grid; grid-template-columns: 1.1fr 1fr;
+  gap: clamp(1.5rem, 5vw, 4rem); align-items: end;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+.about-head h2 { margin: 0; max-width: 14ch; }
+.about-head p { margin-bottom: 1.25rem; }
+
+.expertise {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  margin: 0; padding: 0; list-style: none;
+  border-top: 1px solid var(--line);
+}
+.expertise li { padding: 1.9rem 1.5rem 0; }
+.expertise li:first-child { padding-left: 0; }
+.expertise li + li { border-left: 1px solid var(--line); }
+.expertise svg {
+  width: 30px; height: 30px; margin-bottom: 1.1rem;
+  color: var(--ink);
+}
+.expertise h3 { margin-bottom: 0.45rem; font-size: 1.1rem; }
+.expertise p { margin: 0; font-size: 0.97rem; color: var(--text-muted); }
+
+@media (max-width: 899px) {
+  .about-head { grid-template-columns: 1fr; align-items: start; }
+}
+@media (max-width: 719px) {
+  .expertise { grid-template-columns: 1fr; }
+  .expertise li,
+  .expertise li:first-child { padding: 1.5rem 0; border-left: 0; border-bottom: 1px solid var(--line); }
+}
+
+
+/* 3. FEATURED PROJECTS ------------------------------------------------------ */
+.projects-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.25rem, 3vw, 2rem);
+}
+.project-wrap { display: flex; }            /* data-reveal lives here so it never fights the tilt */
+.project { display: flex; flex-direction: column; width: 100%; overflow: hidden; }
+
+.project-media {
+  display: block; overflow: hidden; aspect-ratio: 2 / 1;
+  background: var(--ink-raised);
+}
+.project-media img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top;
+  transition: transform 0.7s var(--ease);
+}
+.project:hover .project-media img { transform: scale(1.06); }
+
+.project-body {
+  display: flex; flex: 1; flex-direction: column; gap: 0.9rem;
+  padding: 1.5rem 1.6rem 1.7rem;
+}
+.project-body h3 { margin: 0; }
+.project-body p { margin: 0; font-size: 0.98rem; color: var(--text-muted); }
+
+.project-link {
+  display: inline-flex; align-items: center; gap: 0.5rem; margin-top: auto; padding-top: 0.4rem;
+  font-weight: 700; color: var(--text); text-decoration: none;
+  transition: color 0.2s;
+}
+.project-link:hover { color: var(--amber); }
+.project-link svg { width: 18px; height: 18px; }
+
+@media (max-width: 799px) {
+  .projects-grid { grid-template-columns: 1fr; }
+}
